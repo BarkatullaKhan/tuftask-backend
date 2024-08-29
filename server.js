@@ -8,15 +8,39 @@ app.use(cors());
 app.use(express.json());
 
 const conn_pool = mysql.createPool({
-  connectionLimit: 100,
+  connectionLimit: 1000,
+  connectTimeout: 60 * 60 * 1000,
+  acquireTimeout: 60 * 60 * 1000,
+  timeout: 60 * 60 * 1000,
   host: process.env.MYSQL_HOST,
   user: process.env.MYSQL_USER,
   password: process.env.MYSQL_PASSWORD,
   database: process.env.MYSQL_DB,
+  port:24604
 });
 
 app.get("/", (req, res) => {
   return res.json(`From Backend ${process.env.MYSQL_HOST}`);
+});
+
+app.get("/createTable", (req, res) => {
+  const query =
+    "CREATE TABLE banner (id INT AUTO_INCREMENT PRIMARY KEY, showTill TEXT NOT NULL, description TEXT, link TEXT, showBanner BOOLEAN NOT NULL DEFAULT TRUE)";
+  conn_pool.getConnection(function (err, connection) {
+    if (err) {
+      // connection.release();
+      console.log(err);
+      res.json(err);
+    }
+    connection.query(query, (err2, result) => {
+      if (err2) {
+        console.log(err2);
+        // connection.release();
+      }
+      res.json(result);
+      // connection.release();
+    });
+  });
 });
 
 app.get("/bannerData", (req, res) => {
