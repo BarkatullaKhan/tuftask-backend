@@ -16,7 +16,7 @@ const conn_pool = mysql.createPool({
   user: process.env.MYSQL_USER,
   password: process.env.MYSQL_PASSWORD,
   database: process.env.MYSQL_DB,
-  port:24604
+  port:process.env.MYSQL_PORT
 });
 
 app.get("/", (req, res) => {
